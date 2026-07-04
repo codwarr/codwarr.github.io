@@ -2,67 +2,92 @@
 <html lang="fa">
 <head>
 <meta charset="UTF-8">
+<title>اخبار کالاف وار</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>اخبار 📝</title>
 
 <style>
-@font-face {
-    font-family: 'myfont';
-    src: url('font.ttf');
-}
-
 body {
+    background: #0d0a07;
     margin: 0;
-    padding: 0;
-    background: #0a0a0a;
-    font-family: 'myfont';
-    color: #f5e4b0;
+    font-family: 'font', sans-serif;
+    direction: rtl;
+    color: #f5d99c;
 }
 
-.box {
-    width: 92%;
-    margin: 20px auto;
+/* عنوان صفحه */
+.header {
+    text-align: center;
+    padding: 25px 0;
+    font-size: 35px;
+    color: #f7e7c1;
+    text-shadow: 0 0 15px #d4a84f, 0 0 30px #b8860b;
+    font-weight: bold;
+}
+
+/* ظرف اخبار */
+#news-container {
+    width: 90%;
+    margin: auto;
+    padding-bottom: 200px;
+}
+
+/* کارت خبر */
+.news-box {
+    background: linear-gradient(180deg, rgba(60,45,20,0.9), rgba(30,20,10,0.9));
+    border: 2px solid #caa86b;
+    border-radius: 15px;
     padding: 20px;
-    background: linear-gradient(135deg, #2a2414, #1a140a);
-    border: 3px solid #c9b06a;
-    border-radius: 16px;
-    box-shadow: 0 0 25px rgba(255,200,120,0.25);
-    animation: fadeIn 0.7s ease;
+    margin: 25px 0;
+    box-shadow: 0 0 25px rgba(255,215,130,0.25);
+    backdrop-filter: blur(4px);
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.box h2 {
-    font-size: 28px;
+/* عنوان خبر */
+.news-title {
+    font-size: 26px;
+    font-weight: bold;
+    color: #f7e7c1;
+    text-shadow: 0 0 10px #d4a84f;
     margin-bottom: 10px;
-    color: #f5e4b0;
-    text-shadow: 0 0 10px rgba(255,200,120,0.4);
 }
 
-.box p {
+/* متن خبر */
+.news-text {
     font-size: 18px;
-    color: #d8c89a;
-    line-height: 1.7;
+    line-height: 32px;
+    margin-bottom: 15px;
 }
 
-.box img, .box video {
+/* زمان خبر */
+.news-time {
+    font-size: 15px;
+    opacity: 0.8;
+    margin-top: 10px;
+}
+
+/* عکس‌ها */
+.news-images img {
     width: 100%;
-    margin-top: 15px;
     border-radius: 12px;
-    border: 2px solid #c9b06a;
-    box-shadow: 0 0 15px rgba(255,200,120,0.3);
+    margin-top: 10px;
+    border: 2px solid #caa86b;
+    box-shadow: 0 0 15px rgba(255,215,130,0.3);
+}
+
+/* ویدیو */
+.news-images video {
+    width: 100%;
+    border-radius: 12px;
+    margin-top: 10px;
+    border: 2px solid #caa86b;
+    box-shadow: 0 0 15px rgba(255,215,130,0.3);
 }
 </style>
 </head>
 
 <body>
 
-<h1 style="text-align:center; font-size:42px; margin-top:20px; text-shadow:0 0 20px rgba(255,200,120,0.5);">
-اخبار 📝
-</h1>
+<div class="header">اخبار کالاف وار ⚔️</div>
 
 <div id="news-container"></div>
 
@@ -70,22 +95,58 @@ body {
 fetch("news-data.txt")
     .then(res => res.text())
     .then(data => {
+        let lines = data.split("\n");
         let html = "";
-        data.split("\n").forEach(line => {
+
+        lines.forEach(line => {
             if (line.trim() !== "") {
-                let p = line.split("|");
+
+                let parts = line.split("|");
+                let title = parts[0];
+                let text = parts[1];
+                let imgs = parts[2];
+                let vids = parts[3];
+                let time;
+
+                // زمان خودکار
+                if (parts[4] === "auto") {
+                    const now = new Date();
+                    time = now.toLocaleString("fa-IR");
+                } else {
+                    time = parts[4];
+                }
+
+                // عکس‌ها
+                let imgHtml = "";
+                if (imgs !== "none") {
+                    imgs.split(",").forEach(src => {
+                        imgHtml += `<img src="${src.trim()}">`;
+                    });
+                }
+
+                // ویدیوها
+                let vidHtml = "";
+                if (vids !== "none") {
+                    vids.split(",").forEach(src => {
+                        vidHtml += `<video controls src="${src.trim()}"></video>`;
+                    });
+                }
 
                 html += `
-                    <div class="box">
-                        <h2>${p[0]}</h2>
-                        ${p[1] !== "none" ? `<p>${p[1]}</p>` : ""}
-                        ${p[2] !== "none" ? `<img src="${p[2]}">` : ""}
-                        ${p[3] !== "none" ? `<video controls><source src="${p[3]}"></video>` : ""}
+                    <div class="news-box">
+                        <div class="news-title">${title}</div>
+                        <div class="news-text">${text}</div>
+                        <div class="news-images">${imgHtml}${vidHtml}</div>
+                        <div class="news-time">🕒 ${time}</div>
                     </div>
                 `;
             }
         });
+
         document.getElementById("news-container").innerHTML = html;
+
+        // اسکرول به پایین‌ترین خبر
+        window.scrollTo(0, document.body.scrollHeight);
     });
 </script>
 
