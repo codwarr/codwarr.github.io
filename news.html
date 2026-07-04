@@ -56,38 +56,15 @@ body {
     margin-bottom: 10px;
 }
 
-/* متن خبر */
+/* توضیح */
 .news-text {
     font-size: 18px;
     line-height: 32px;
     margin-bottom: 15px;
 }
 
-/* زمان خبر */
-.news-time {
-    font-size: 15px;
-    color: #d4a84f;
-    text-shadow: 0 0 8px #b8860b;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-.news-time::before {
-    content: "⏳";
-    font-size: 18px;
-}
-
 /* عکس‌ها */
 .news-images img {
-    width: 100%;
-    border-radius: 12px;
-    margin-top: 10px;
-    border: 2px solid #caa86b;
-    box-shadow: 0 0 15px rgba(255,215,130,0.3);
-}
-
-/* ویدیو */
-.news-images video {
     width: 100%;
     border-radius: 12px;
     margin-top: 10px;
@@ -114,24 +91,13 @@ fetch("news-data.txt")
             if (line.trim() !== "") {
                 let parts = line.split("|");
 
-                let title = parts[0] || "";
-                let text  = parts[1] || "";
-                let imgs  = parts[2] || "none";
-                let vids  = parts[3] || "none";
-                let rawTime = parts[4];
-
-                // زمان خودکار
-                let time;
-                if (!rawTime || rawTime === "auto") {
-                    const now = new Date();
-                    time = now.toLocaleString("fa-IR");
-                } else {
-                    time = rawTime;
-                }
+                let title = parts[0];
+                let text  = parts[1]; // توضیح (که تو تاریخ رو اینجا می‌نویسی)
+                let imgs  = parts[2];
 
                 // عکس‌ها
                 let imgHtml = "";
-                if (imgs && imgs !== "none" && imgs.trim() !== "") {
+                if (imgs && imgs.trim() !== "") {
                     imgs.split(",").forEach(src => {
                         src = src.trim();
                         if (src !== "") {
@@ -140,23 +106,11 @@ fetch("news-data.txt")
                     });
                 }
 
-                // ویدیوها (فقط اگر واقعاً لینک هست)
-                let vidHtml = "";
-                if (vids && vids !== "none" && vids.trim() !== "") {
-                    vids.split(",").forEach(src => {
-                        src = src.trim();
-                        if (src !== "") {
-                            vidHtml += `<video controls src="${src}"></video>`;
-                        }
-                    });
-                }
-
                 html += `
                     <div class="news-box">
                         <div class="news-title">${title}</div>
-                        ${text && text !== "none" ? `<div class="news-text">${text}</div>` : ""}
-                        <div class="news-images">${imgHtml}${vidHtml}</div>
-                        <div class="news-time">${time}</div>
+                        ${text && text !== "" ? `<div class="news-text">${text}</div>` : ""}
+                        <div class="news-images">${imgHtml}</div>
                     </div>
                 `;
             }
@@ -164,7 +118,7 @@ fetch("news-data.txt")
 
         document.getElementById("news-container").innerHTML = html;
 
-        // اسکرول به پایین‌ترین خبر (جدیدترین)
+        // اسکرول به پایین‌ترین خبر
         window.scrollTo(0, document.body.scrollHeight);
     });
 </script>
