@@ -7,7 +7,7 @@
 
 <style>
 body {
-    background: #0d0a07;
+    background: radial-gradient(circle at top, #1a1208, #0a0703);
     margin: 0;
     font-family: 'font', sans-serif;
     direction: rtl;
@@ -18,10 +18,11 @@ body {
 .header {
     text-align: center;
     padding: 25px 0;
-    font-size: 35px;
+    font-size: 36px;
     color: #f7e7c1;
-    text-shadow: 0 0 15px #d4a84f, 0 0 30px #b8860b;
+    text-shadow: 0 0 20px #d4a84f, 0 0 40px #b8860b;
     font-weight: bold;
+    border-bottom: 2px solid #caa86b;
 }
 
 /* ظرف اخبار */
@@ -40,6 +41,11 @@ body {
     margin: 25px 0;
     box-shadow: 0 0 25px rgba(255,215,130,0.25);
     backdrop-filter: blur(4px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.news-box:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 40px rgba(255,215,130,0.45);
 }
 
 /* عنوان خبر */
@@ -61,8 +67,15 @@ body {
 /* زمان خبر */
 .news-time {
     font-size: 15px;
-    opacity: 0.8;
-    margin-top: 10px;
+    color: #d4a84f;
+    text-shadow: 0 0 8px #b8860b;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.news-time::before {
+    content: "⏳";
+    font-size: 18px;
 }
 
 /* عکس‌ها */
@@ -100,7 +113,6 @@ fetch("news-data.txt")
 
         lines.forEach(line => {
             if (line.trim() !== "") {
-
                 let parts = line.split("|");
                 let title = parts[0];
                 let text = parts[1];
@@ -109,7 +121,7 @@ fetch("news-data.txt")
                 let time;
 
                 // زمان خودکار
-                if (parts[4] === "auto") {
+                if (parts[4] === "auto" || parts[4] === undefined || parts[4] === "") {
                     const now = new Date();
                     time = now.toLocaleString("fa-IR");
                 } else {
@@ -118,7 +130,7 @@ fetch("news-data.txt")
 
                 // عکس‌ها
                 let imgHtml = "";
-                if (imgs !== "none") {
+                if (imgs !== "none" && imgs.trim() !== "") {
                     imgs.split(",").forEach(src => {
                         imgHtml += `<img src="${src.trim()}">`;
                     });
@@ -126,7 +138,7 @@ fetch("news-data.txt")
 
                 // ویدیوها
                 let vidHtml = "";
-                if (vids !== "none") {
+                if (vids !== "none" && vids.trim() !== "") {
                     vids.split(",").forEach(src => {
                         vidHtml += `<video controls src="${src.trim()}"></video>`;
                     });
@@ -135,9 +147,9 @@ fetch("news-data.txt")
                 html += `
                     <div class="news-box">
                         <div class="news-title">${title}</div>
-                        <div class="news-text">${text}</div>
+                        ${text && text !== "none" ? `<div class="news-text">${text}</div>` : ""}
                         <div class="news-images">${imgHtml}${vidHtml}</div>
-                        <div class="news-time">🕒 ${time}</div>
+                        <div class="news-time">${time}</div>
                     </div>
                 `;
             }
