@@ -2,92 +2,127 @@
 <html lang="fa">
 <head>
 <meta charset="UTF-8">
+<title>اتچمنت‌ها</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>اتچمنت‌ها ⚔️</title>
 
 <style>
-@font-face {
-    font-family: 'myfont';
-    src: url('font.ttf');
-}
-
 body {
+    background: radial-gradient(circle at top, #1a1208, #0a0703);
     margin: 0;
-    padding: 0;
-    background: #0a0a0a;
-    font-family: 'myfont';
-    color: #f5e4b0;
+    font-family: 'font', sans-serif;
+    direction: rtl;
+    color: #f5d99c;
+    text-align: center;
 }
 
-/* کارت باستانی خفن */
-.box {
-    width: 92%;
-    margin: 20px auto;
+/* عنوان */
+.header {
+    font-size: 36px;
+    color: #f7e7c1;
+    text-shadow: 0 0 20px #d4a84f, 0 0 40px #b8860b;
+    padding: 25px 0;
+    font-weight: bold;
+}
+
+/* دکمه‌های انتخاب مود */
+.mode-btn {
+    background: linear-gradient(180deg, rgba(80,60,30,0.95), rgba(40,25,10,0.9));
+    border: 2px solid #d4a84f;
+    border-radius: 15px;
     padding: 20px;
-    background: linear-gradient(135deg, #2a2414, #1a140a);
-    border: 3px solid #c9b06a;
-    border-radius: 16px;
-    box-shadow: 0 0 25px rgba(255,200,120,0.25);
-    animation: fadeIn 0.7s ease;
+    margin: 20px auto;
+    width: 85%;
+    font-size: 24px;
+    color: #f7e7c1;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 0 25px rgba(255,215,130,0.25);
+    transition: 0.3s;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+.mode-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 40px rgba(255,215,130,0.45);
 }
 
-.box h2 {
-    font-size: 28px;
-    margin-bottom: 10px;
-    color: #f5e4b0;
-    text-shadow: 0 0 10px rgba(255,200,120,0.4);
+/* باکس اتچمنت‌ها */
+#attachment-box {
+    margin-top: 30px;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.box p {
-    font-size: 18px;
-    color: #d8c89a;
-    line-height: 1.7;
+/* کارت اتچمنت */
+.att-card {
+    background: linear-gradient(180deg, rgba(60,45,20,0.95), rgba(30,20,10,0.9));
+    border: 2px solid #d4a84f;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 25px 0;
+    box-shadow: 0 0 25px rgba(255,215,130,0.25);
+    text-align: center;
 }
 
-.box img, .box video {
+.att-card img {
     width: 100%;
-    margin-top: 15px;
     border-radius: 12px;
-    border: 2px solid #c9b06a;
-    box-shadow: 0 0 15px rgba(255,200,120,0.3);
+    margin-top: 10px;
+    border: 2px solid #caa86b;
+    box-shadow: 0 0 15px rgba(255,215,130,0.3);
+}
+
+.att-title {
+    font-size: 26px;
+    font-weight: bold;
+    color: #f7e7c1;
+    text-shadow: 0 0 10px #d4a84f;
+    margin-bottom: 10px;
 }
 </style>
 </head>
 
 <body>
 
-<h1 style="text-align:center; font-size:42px; margin-top:20px; text-shadow:0 0 20px rgba(255,200,120,0.5);">
-اتچمنت‌ها ⚔️
-</h1>
+<div class="header">اتچمنت‌ها ⚔️</div>
 
-<div id="att-container"></div>
+<!-- دکمه‌های انتخاب مود -->
+<div class="mode-btn" onclick="loadMode('multi')">اتچمنت‌های مولتی ⚔️</div>
+<div class="mode-btn" onclick="loadMode('br')">اتچمنت‌های بتل رویال 🛡️</div>
+
+<!-- باکس نمایش اتچمنت‌ها -->
+<div id="attachment-box"></div>
 
 <script>
-fetch("attachments-data.txt")
-    .then(res => res.text())
-    .then(data => {
-        let html = "";
-        data.split("\n").forEach(line => {
-            if (line.trim() !== "") {
-                let p = line.split("|");
+function loadMode(mode) {
+    fetch("attachments-data.txt")
+        .then(res => res.text())
+        .then(data => {
+            let lines = data.split("\n");
+            let html = "";
 
-                html += `
-                    <div class="box">
-                        <h2>${p[0]}</h2>
-                        ${p[1] !== "none" ? `<p>${p[1]}</p>` : ""}
-                        ${p[2] !== "none" ? `<img src="${p[2]}">` : ""}
-                        ${p[3] !== "none" ? `<video controls><source src="${p[3]}"></video>` : ""}
-                    </div>
-                `;
-            }
+            lines.forEach(line => {
+                if (line.trim() !== "") {
+                    let parts = line.split("|");
+
+                    let title = parts[0];
+                    let img = parts[1];
+                    let type = parts[2]; // multi یا br
+
+                    if (type === mode) {
+                        html += `
+                            <div class="att-card">
+                                <div class="att-title">${title}</div>
+                                <img src="${img}">
+                            </div>
+                        `;
+                    }
+                }
+            });
+
+            document.getElementById("attachment-box").innerHTML = html;
         });
-        document.getElementById("att-container").innerHTML = html;
-    });
+}
 </script>
 
 </body>
